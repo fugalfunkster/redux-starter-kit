@@ -5,9 +5,11 @@ const validate = require('webpack-validator');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+//const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const cssnext = require('postcss-cssnext');
 const values = require('postcss-modules-values');
+const nested = require('postcss-nested');
 
 // Set up separate paths to our app and build directories
 const path = require('path');
@@ -46,11 +48,15 @@ const common = {
     ]
   },
   plugins: [
-    new HtmlWebpackPlugin({ title: '' }), // Title of the index.html page for our app
+    new HtmlWebpackPlugin({inject: true,
+                           title: '', // Title goes here
+                           template: 'index.html'
+                         }),    
     new ExtractTextPlugin('style.css', { allChunks: true })
+    //new CopyWebpackPlugin([ { from: 'app/images', to: 'app/images/' }])
   ],
   postcss: function () {
-    return [cssnext, values];
+    return [cssnext, values, nested];
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
@@ -60,7 +66,7 @@ const common = {
 
 // Detect how npm is run and branch based on that
 
-var config;
+let config;
 // Production Mixins
 if (process.env.npm_lifecycle_event === 'build') {
   config = merge(
